@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
-import { Box, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
+import { Box, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { FormikValues, FormikHelpers } from 'formik/dist/types';
+import axios from 'axios';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -46,7 +47,8 @@ const rows = [
 export default function Attendance() {
 
     const [open, setOpen] = React.useState(false);
-    const [openUser, setOpenUser] = React.useState(false);
+    const [inputValue, setInputValue] = useState("");
+    const [userList, setUserList] = useState([]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -57,16 +59,33 @@ export default function Attendance() {
     };
 
     const handleClickOpenUser = () => {
-        setOpenUser(true);
+        axios.post('http://localhost:3004/user', {
+            name: inputValue,
+            data: []
+        }, {
+        }).then((res: any) => {
+            setInputValue("")
+            getUser();
+        })
     };
 
-    const handleCloseUser = () => {
-        setOpenUser(false);
-    };
+    useEffect(() => {
+        getUser();
+    }, []);
+
+    const getUser = () => {
+        axios.get(`http://localhost:3004/user`).then((res: any) => {
+            if (res.data) {
+                setUserList(res.data);
+            }
+        });
+    }
 
     return (
         <>
             <Button variant="contained" onClick={handleClickOpen}>Add</Button>
+            <TextField id="outlined-basic" label="Date" variant="outlined" value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)} />
             <Button variant="contained" onClick={handleClickOpenUser}>Add User</Button>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -81,7 +100,7 @@ export default function Attendance() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row, index) => (
+                        {userList.map((row: any, index) => (
                             <StyledTableRow key={row.name}>
                                 <StyledTableCell >{index + 1}</StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
@@ -114,22 +133,57 @@ export default function Attendance() {
                         reading: '',
                         hearing: '',
                     }} onSubmit={values => {
-                        debugger
+                        let userData: any;
+                        axios.get(`http://localhost:3004/user/${values.name}`).then((res: any) => {
+                            if (res.data) {
+                                userData = res.data
+                            }
+                        }).then((res: any) => {
+                            let a = userData.data.push(
+                                {chanting: values.chanting, reading: values.reading, hearing: values.hearing}
+                            )
+                            axios.put(`http://localhost:3004/user/${values.name}`, {
+                                ...userData,
+                                data: 
+                                    userData.data,
+                                
+                            }, {
+                            }).then((res: any) => {
+                                setOpen(false)
+                            })
+                        });
+                       
 
                     }}>
                         {({
                             values,
+                            handleChange,
                             handleSubmit
                         }) => (
                             <Form onSubmit={handleSubmit}>
                                 <Box sx={{
                                     '& > :not(style)': { m: 1, width: '25ch' },
                                 }}>
-                                    <TextField id="outlined-basic" label="Name" name='name' value={values.name} variant="outlined" />
-                                    <TextField id="outlined-basic" label="Date" variant="outlined" />
-                                    <TextField id="outlined-basic" label="Chanting" variant="outlined" />
-                                    <TextField id="outlined-basic" label="Reading" variant="outlined" />
-                                    <TextField id="outlined-basic" label="Hearing" variant="outlined" />
+                                    {/* <TextField id="outlined-basic" label="Name" name='name' onChange={handleChange} value={values.name} variant="outlined" /> */}
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Name</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={values.name}
+                                            name='name'
+                                            label="Name"
+                                            onChange={handleChange}
+                                        >
+                                            {userList.map((row: any, index) => (
+                                                <MenuItem value={row.id}>{row.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    <TextField id="outlined-basic1" label="Date" name='date' onChange={handleChange} value={values.date} variant="outlined" />
+                                    <TextField id="outlined-basic2" label="Chanting" name='chanting' onChange={handleChange} value={values.chanting} variant="outlined" />
+                                    <TextField id="outlined-basic3" label="Reading" name='reading' onChange={handleChange} value={values.reading} variant="outlined" />
+                                    <TextField id="outlined-basic4" label="Hearing" name='hearing' onChange={handleChange} value={values.hearing} variant="outlined" />
                                 </Box>
                                 <DialogActions>
                                     <Button onClick={handleClose}>Disagree</Button>

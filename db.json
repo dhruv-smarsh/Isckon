@@ -1,3 +1,30 @@
 {
-  "user": []
+  "user": [
+    {
+      "name": "Dhruv Bhagat",
+      "data": [
+        {
+          "chanting": "cxc",
+          "reading": "cxc",
+          "hearing": "fdsf"
+        },
+        {
+          "chanting": "ghfh",
+          "reading": "cxc",
+          "hearing": "hghg"
+        },
+        {
+          "chanting": "15",
+          "reading": "cxc",
+          "hearing": "hghg"
+        },
+        {
+          "chanting": "ghfh",
+          "reading": "ghg",
+          "hearing": "hghg"
+        }
+      ],
+      "id": 1
+    }
+  ]
 }
