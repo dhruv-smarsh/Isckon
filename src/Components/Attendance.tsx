@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
-import { Box, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
+import { Box, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { FormikValues, FormikHelpers } from 'formik/dist/types';
 import axios from 'axios';
@@ -59,7 +59,7 @@ export default function Attendance() {
     };
 
     const handleClickOpenUser = () => {
-        axios.post('http://localhost:3004/user', {
+        axios.post('https://daily-report-61b6.onrender.com/user', {
             name: inputValue,
             data: []
         }, {
@@ -74,7 +74,7 @@ export default function Attendance() {
     }, []);
 
     const getUser = () => {
-        axios.get(`http://localhost:3004/user`).then((res: any) => {
+        axios.get(`https://daily-report-61b6.onrender.com/user`).then((res: any) => {
             if (res.data) {
                 setUserList(res.data);
             }
@@ -83,20 +83,25 @@ export default function Attendance() {
 
     return (
         <>
-            <Button variant="contained" onClick={handleClickOpen}>Add</Button>
-            <TextField id="outlined-basic" label="Date" variant="outlined" value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)} />
-            <Button variant="contained" onClick={handleClickOpenUser}>Add User</Button>
+            <Grid container spacing={2} sx={{display: 'flex', justifyContent: 'end', alignItems: 'center'}}>
+                <Grid item >
+                    <TextField id="outlined-basic" label="User" variant="outlined" value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)} />
+                </Grid>
+                <Grid item >
+                    <Button variant="contained" onClick={handleClickOpenUser}>Add User</Button>
+                </Grid>
+            </Grid>
+
+
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                <Table aria-label="customized table">
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>Sr. No</StyledTableCell>
                             <StyledTableCell>Name</StyledTableCell>
-                            <StyledTableCell align="right">Date</StyledTableCell>
-                            <StyledTableCell align="right">Reading</StyledTableCell>
-                            <StyledTableCell align="right">Hearing</StyledTableCell>
-                            <StyledTableCell align="right">Chanting</StyledTableCell>
+                            <StyledTableCell align="right">Start Date</StyledTableCell>
+                            <StyledTableCell align="right"></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -107,9 +112,7 @@ export default function Attendance() {
                                     {row.name}
                                 </StyledTableCell>
                                 <StyledTableCell align="right">{row.calories}</StyledTableCell>
-                                <StyledTableCell align="right">{row.fat}</StyledTableCell>
-                                <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-                                <StyledTableCell align="right">{row.protein}</StyledTableCell>
+                                <StyledTableCell align="right"><Button variant="contained" onClick={handleClickOpen}>Add</Button></StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
@@ -134,25 +137,25 @@ export default function Attendance() {
                         hearing: '',
                     }} onSubmit={values => {
                         let userData: any;
-                        axios.get(`http://localhost:3004/user/${values.name}`).then((res: any) => {
+                        axios.get(`https://daily-report-61b6.onrender.com/user/${values.name}`).then((res: any) => {
                             if (res.data) {
                                 userData = res.data
                             }
                         }).then((res: any) => {
                             let a = userData.data.push(
-                                {chanting: values.chanting, reading: values.reading, hearing: values.hearing}
+                                { chanting: values.chanting, reading: values.reading, hearing: values.hearing }
                             )
-                            axios.put(`http://localhost:3004/user/${values.name}`, {
+                            axios.put(`https://daily-report-61b6.onrender.com/user/${values.name}`, {
                                 ...userData,
-                                data: 
+                                data:
                                     userData.data,
-                                
+
                             }, {
                             }).then((res: any) => {
                                 setOpen(false)
                             })
                         });
-                       
+
 
                     }}>
                         {({
