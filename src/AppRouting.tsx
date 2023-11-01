@@ -15,9 +15,9 @@ export class AppRouting extends Component {
         <>
             <Router>
               <Routes>
-                <Route path={`*`} element={<Navigate replace  to="/Attendance"/>}/>
-                <Route path={`/Attendance`} element={<Attendance/>}/>
-                <Route path={`/Profile`} element={<Profile/>}/>
+                <Route path={`*`} element={<Navigate replace  to="Isckon/Attendance"/>}/>
+                <Route path={`Isckon/Attendance`} element={<Attendance/>}/>
+                <Route path={`Isckon/Profile`} element={<Profile/>}/>
               </Routes>
             </Router>
         </>
