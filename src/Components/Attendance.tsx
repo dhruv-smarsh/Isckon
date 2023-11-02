@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
-import { Box, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
+import { Backdrop, Box, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
 import { Form, Formik } from 'formik';
 import { FormikValues, FormikHelpers } from 'formik/dist/types';
 import axios from 'axios';
+import Profile from './Profile';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -47,10 +48,14 @@ const rows = [
 export default function Attendance() {
 
     const [open, setOpen] = React.useState(false);
+    const [openBackDrop, setOpenBackDrop] = React.useState(false);
+    const [profileData, setProfileData] = React.useState(false);
     const [inputValue, setInputValue] = useState("");
+    const [id, setId] = useState("");
     const [userList, setUserList] = useState([]);
 
-    const handleClickOpen = () => {
+    const handleClickOpen = (id?: any) => {
+        setId(id)
         setOpen(true);
     };
 
@@ -59,6 +64,7 @@ export default function Attendance() {
     };
 
     const handleClickOpenUser = () => {
+        setOpenBackDrop(true)
         axios.post('https://daily-report-61b6.onrender.com/user', {
             name: inputValue,
             data: []
@@ -74,16 +80,19 @@ export default function Attendance() {
     }, []);
 
     const getUser = () => {
+        setOpenBackDrop(true)
         axios.get(`https://daily-report-61b6.onrender.com/user`).then((res: any) => {
             if (res.data) {
                 setUserList(res.data);
             }
+        }).then((res: any) => {
+            setOpenBackDrop(false);
         });
     }
 
     return (
         <>
-            <Grid container spacing={2} sx={{display: 'flex', justifyContent: 'end', alignItems: 'center'}}>
+            <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
                 <Grid item >
                     <TextField id="outlined-basic" label="User" variant="outlined" value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)} />
@@ -100,24 +109,33 @@ export default function Attendance() {
                         <TableRow>
                             <StyledTableCell>Sr. No</StyledTableCell>
                             <StyledTableCell>Name</StyledTableCell>
-                            <StyledTableCell align="right">Start Date</StyledTableCell>
-                            <StyledTableCell align="right"></StyledTableCell>
+                            <StyledTableCell ></StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {userList.map((row: any, index) => (
-                            <StyledTableRow key={row.name}>
+                            <StyledTableRow key={row.name} >
                                 <StyledTableCell >{index + 1}</StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
                                     {row.name}
                                 </StyledTableCell>
-                                <StyledTableCell align="right">{row.calories}</StyledTableCell>
-                                <StyledTableCell align="right"><Button variant="contained" onClick={handleClickOpen}>Add</Button></StyledTableCell>
+                                <StyledTableCell align="right" >
+                                    <Button sx={{
+                                        marginRight: '10px'
+                                    }} variant="contained" onClick={() => handleClickOpen(row.id)}>Add</Button>
+                                    <Button variant="contained" onClick={() => setProfileData(true)}>View</Button>
+                                    </StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
+                open={openBackDrop}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
 
             <Dialog
                 open={open}
@@ -130,12 +148,13 @@ export default function Attendance() {
                 </DialogTitle>
                 <DialogContent>
                     <Formik initialValues={{
-                        name: '',
+                        name: id,
                         date: '',
                         chanting: '',
                         reading: '',
                         hearing: '',
                     }} onSubmit={values => {
+                        setOpenBackDrop(true)
                         let userData: any;
                         axios.get(`https://daily-report-61b6.onrender.com/user/${values.name}`).then((res: any) => {
                             if (res.data) {
@@ -153,6 +172,7 @@ export default function Attendance() {
                             }, {
                             }).then((res: any) => {
                                 setOpen(false)
+                                setOpenBackDrop(false)
                             })
                         });
 
@@ -177,13 +197,14 @@ export default function Attendance() {
                                             name='name'
                                             label="Name"
                                             onChange={handleChange}
+                                            defaultValue={id}
                                         >
                                             {userList.map((row: any, index) => (
-                                                <MenuItem value={row.id}>{row.name}</MenuItem>
+                                                <MenuItem key={index} value={row.id}>{row.name}</MenuItem>
                                             ))}
                                         </Select>
                                     </FormControl>
-                                    <TextField id="outlined-basic1" label="Date" name='date' onChange={handleChange} value={values.date} variant="outlined" />
+                                    <TextField id="outlined-basic1" label="Date" type='date' name='date' onChange={handleChange} value={values.date} variant="outlined" />
                                     <TextField id="outlined-basic2" label="Chanting" name='chanting' onChange={handleChange} value={values.chanting} variant="outlined" />
                                     <TextField id="outlined-basic3" label="Reading" name='reading' onChange={handleChange} value={values.reading} variant="outlined" />
                                     <TextField id="outlined-basic4" label="Hearing" name='hearing' onChange={handleChange} value={values.hearing} variant="outlined" />
@@ -198,6 +219,21 @@ export default function Attendance() {
                         )}
                     </Formik>
                 </DialogContent>
+            </Dialog>
+
+
+            <Dialog
+                open={profileData}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+               
+                <DialogContent>
+                    <Profile/>
+                </DialogContent>
+                <DialogActions>
+                                    <Button onClick={() => setProfileData(false)}>Close</Button>
+                                </DialogActions>
             </Dialog>
         </>
     )
