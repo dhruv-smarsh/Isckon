@@ -6,7 +6,8 @@ import AppRouting from './AppRouting';
 function App() {
   return (
     <>
-    <AppRouting/>
+    <Attendance/>
+    {/* <AppRouting/> */}
     </>
   );
 }
