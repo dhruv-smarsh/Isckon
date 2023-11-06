@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Isckon/static/css/main.fb69f5f4.css",
-    "main.js": "/Isckon/static/js/main.3ffaabb0.js",
+    "main.js": "/Isckon/static/js/main.39f24465.js",
     "static/js/787.2e952126.chunk.js": "/Isckon/static/js/787.2e952126.chunk.js",
     "index.html": "/Isckon/index.html",
     "main.fb69f5f4.css.map": "/Isckon/static/css/main.fb69f5f4.css.map",
-    "main.3ffaabb0.js.map": "/Isckon/static/js/main.3ffaabb0.js.map",
+    "main.39f24465.js.map": "/Isckon/static/js/main.39f24465.js.map",
     "787.2e952126.chunk.js.map": "/Isckon/static/js/787.2e952126.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.fb69f5f4.css",
-    "static/js/main.3ffaabb0.js"
+    "static/js/main.39f24465.js"
   ]
 }
