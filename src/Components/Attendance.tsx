@@ -65,7 +65,7 @@ export default function Attendance() {
 
     const handleClickOpenUser = () => {
         setOpenBackDrop(true)
-        axios.post('https://daily-report-61b6.onrender.com/user', {
+        axios.post('https://localhost:5000/user', {
             name: inputValue,
             data: []
         }, {
@@ -81,7 +81,7 @@ export default function Attendance() {
 
     const getUser = () => {
         setOpenBackDrop(true)
-        axios.get(`https://daily-report-61b6.onrender.com/user`).then((res: any) => {
+        axios.get(`https://localhost:5000/user`).then((res: any) => {
             if (res.data) {
                 setUserList(res.data);
             }
@@ -156,7 +156,7 @@ export default function Attendance() {
                     }} onSubmit={values => {
                         setOpenBackDrop(true)
                         let userData: any;
-                        axios.get(`https://daily-report-61b6.onrender.com/user/${values.name}`).then((res: any) => {
+                        axios.get(`https://localhost:5000/user/${values.name}`).then((res: any) => {
                             if (res.data) {
                                 userData = res.data
                             }
@@ -164,7 +164,7 @@ export default function Attendance() {
                             let a = userData.data.push(
                                 { chanting: values.chanting, reading: values.reading, hearing: values.hearing }
                             )
-                            axios.put(`https://daily-report-61b6.onrender.com/user/${values.name}`, {
+                            axios.put(`https://localhost:5000/user/${values.name}`, {
                                 ...userData,
                                 data:
                                     userData.data,
