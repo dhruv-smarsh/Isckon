@@ -65,14 +65,27 @@ export default function Attendance() {
 
     const handleClickOpenUser = () => {
         setOpenBackDrop(true)
-        axios.post('https://localhost:5000/user', {
-            name: inputValue,
-            data: []
-        }, {
-        }).then((res: any) => {
-            setInputValue("")
-            getUser();
-        })
+        fetch(
+            "https://json-server-e275a-default-rtdb.firebaseio.com/user.json",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: inputValue
+                })
+            }
+        )
+        // axios.post('https://json-server-e275a-default-rtdb.firebaseio.com/user.json', {
+        //     name: inputValue,
+        //     data: []
+        // }, {
+        // }).then((res: any) => {
+        //     debugger
+        //     setInputValue("")
+        //     getUser();
+        // })
     };
 
     useEffect(() => {
@@ -81,7 +94,7 @@ export default function Attendance() {
 
     const getUser = () => {
         setOpenBackDrop(true)
-        axios.get(`https://localhost:5000/user`).then((res: any) => {
+        axios.get(`https://json-server-e275a-default-rtdb.firebaseio.com/user.json`).then((res: any) => {
             if (res.data) {
                 setUserList(res.data);
             }
@@ -113,7 +126,7 @@ export default function Attendance() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {userList.map((row: any, index) => (
+                        {Object.values(userList).map((row: any, index) => (
                             <StyledTableRow key={row.name} >
                                 <StyledTableCell >{index + 1}</StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
@@ -156,25 +169,30 @@ export default function Attendance() {
                     }} onSubmit={values => {
                         setOpenBackDrop(true)
                         let userData: any;
-                        axios.get(`https://localhost:5000/user/${values.name}`).then((res: any) => {
-                            if (res.data) {
-                                userData = res.data
-                            }
-                        }).then((res: any) => {
-                            let a = userData.data.push(
-                                { chanting: values.chanting, reading: values.reading, hearing: values.hearing }
-                            )
-                            axios.put(`https://localhost:5000/user/${values.name}`, {
-                                ...userData,
-                                data:
-                                    userData.data,
+                        debugger
+                        axios.post(`https://json-server-e275a-default-rtdb.firebaseio.com/user.json`).then((res: any)  => {
+                            debugger
+                            console.log(res)
+                        })
+                        // axios.get(`https://localhost:5000/user/${values.name}`).then((res: any) => {
+                        //     if (res.data) {
+                        //         userData = res.data
+                        //     }
+                        // }).then((res: any) => {
+                        //     let a = userData.data.push(
+                        //         { chanting: values.chanting, reading: values.reading, hearing: values.hearing }
+                        //     )
+                        //     axios.put(`https://localhost:5000/user/${values.name}`, {
+                        //         ...userData,
+                        //         data:
+                        //             userData.data,
 
-                            }, {
-                            }).then((res: any) => {
-                                setOpen(false)
-                                setOpenBackDrop(false)
-                            })
-                        });
+                        //     }, {
+                        //     }).then((res: any) => {
+                        //         setOpen(false)
+                        //         setOpenBackDrop(false)
+                        //     })
+                        // });
 
 
                     }}>
