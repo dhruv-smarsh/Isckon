@@ -1,6 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
-import { Backdrop, Box, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, styled, tableCellClasses } from '@mui/material';
+import {
+    Backdrop,
+    Box,
+    CircularProgress,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    styled,
+    tableCellClasses,
+    TablePagination
+} from '@mui/material';
 import { Form, Formik } from 'formik';
 import { FormikValues, FormikHelpers } from 'formik/dist/types';
 import axios from 'axios';
@@ -50,9 +76,21 @@ export default function Attendance() {
     const [open, setOpen] = React.useState(false);
     const [openBackDrop, setOpenBackDrop] = React.useState(false);
     const [profileData, setProfileData] = React.useState(false);
+    const [isEdit, setIsEdit] = React.useState(false);
     const [inputValue, setInputValue] = useState("");
     const [id, setId] = useState("");
     const [userList, setUserList] = useState([]);
+
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const handleChangePage = (event: any, newPage: any) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: any) => {
+        setPage(0);
+        setRowsPerPage(parseInt(event.target.value, 10));
+    };
 
     const handleClickOpen = (id?: any) => {
         setId(id)
@@ -73,19 +111,13 @@ export default function Attendance() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    name: inputValue
+                    name: inputValue,
+                    data: []
                 })
             }
         )
-        // axios.post('https://json-server-e275a-default-rtdb.firebaseio.com/user.json', {
-        //     name: inputValue,
-        //     data: []
-        // }, {
-        // }).then((res: any) => {
-        //     debugger
-        //     setInputValue("")
-        //     getUser();
-        // })
+            setInputValue("")
+            getUser();
     };
 
     useEffect(() => {
@@ -135,14 +167,23 @@ export default function Attendance() {
                                 <StyledTableCell align="right" >
                                     <Button sx={{
                                         marginRight: '10px'
-                                    }} variant="contained" onClick={() => handleClickOpen(row.id)}>Add</Button>
-                                    <Button variant="contained" onClick={() => setProfileData(true)}>View</Button>
+                                    }} variant="contained" onClick={() => handleClickOpen(row.name)}>Add</Button>
+                                    <Button variant="contained" onClick={() => (setProfileData(true), setIsEdit(row.name))}>View</Button>
                                     </StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={Object.values(userList).length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme: { zIndex: { drawer: number; }; }) => theme.zIndex.drawer + 1 }}
                 open={openBackDrop}
@@ -168,31 +209,25 @@ export default function Attendance() {
                         hearing: '',
                     }} onSubmit={values => {
                         setOpenBackDrop(true)
-                        let userData: any;
-                        debugger
-                        axios.post(`https://json-server-e275a-default-rtdb.firebaseio.com/user.json`).then((res: any)  => {
-                            debugger
-                            console.log(res)
+                        fetch(
+                            "https://json-server-e275a-default-rtdb.firebaseio.com/userData.json",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    chanting: values.chanting,
+                                    hearing: values.hearing,
+                                    name: values.name,
+                                    reading: values.reading,
+                                    date: values.date
+                                })
+                            }
+                        ).then((res: any) => {
+                            setOpenBackDrop(false)
+                            setOpen(false)
                         })
-                        // axios.get(`https://localhost:5000/user/${values.name}`).then((res: any) => {
-                        //     if (res.data) {
-                        //         userData = res.data
-                        //     }
-                        // }).then((res: any) => {
-                        //     let a = userData.data.push(
-                        //         { chanting: values.chanting, reading: values.reading, hearing: values.hearing }
-                        //     )
-                        //     axios.put(`https://localhost:5000/user/${values.name}`, {
-                        //         ...userData,
-                        //         data:
-                        //             userData.data,
-
-                        //     }, {
-                        //     }).then((res: any) => {
-                        //         setOpen(false)
-                        //         setOpenBackDrop(false)
-                        //     })
-                        // });
 
 
                     }}>
@@ -217,8 +252,8 @@ export default function Attendance() {
                                             onChange={handleChange}
                                             defaultValue={id}
                                         >
-                                            {userList.map((row: any, index) => (
-                                                <MenuItem key={index} value={row.id}>{row.name}</MenuItem>
+                                            {Object.values(userList).map((row: any, index) => (
+                                                <MenuItem key={index} value={row.name}>{row.name}</MenuItem>
                                             ))}
                                         </Select>
                                     </FormControl>
@@ -245,9 +280,9 @@ export default function Attendance() {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-               
+
                 <DialogContent>
-                    <Profile/>
+                    <Profile name={isEdit}/>
                 </DialogContent>
                 <DialogActions>
                                     <Button onClick={() => setProfileData(false)}>Close</Button>

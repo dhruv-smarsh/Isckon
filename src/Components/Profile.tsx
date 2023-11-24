@@ -1,5 +1,7 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, styled, tableCellClasses } from '@mui/material'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
+import axios from "axios";
+import Button from "@mui/material/Button";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -21,7 +23,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function Profile() {
+export default function Profile(props: any) {
+    const [userList, setUserList] = useState([]);
+
+
+   const getUserData = () => {
+       axios.get(`https://json-server-e275a-default-rtdb.firebaseio.com/userData.json`).then((res: any) => {
+           if (res.data) {
+               const ar: any = Object.values(res.data).filter((r: any) => r.name == props.name)
+               setUserList(ar);
+           }
+       }).then((res: any) => {
+           // setOpenBackDrop(false);
+       });
+   }
+
+    useEffect(() => {
+        getUserData();
+    }, []);
+
   return (
     <>
     <TableContainer component={Paper} sx={{
@@ -36,15 +56,25 @@ export default function Profile() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        
-                            <StyledTableRow >
-                                <StyledTableCell >1</StyledTableCell>
+
+                        {userList.map((row: any, index) => (
+                            <StyledTableRow key={index} >
+                                <StyledTableCell >{index + 1}</StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
-                                    name
+                                    {row.name}
                                 </StyledTableCell>
-                                <StyledTableCell align="right">calories</StyledTableCell>
+                                <StyledTableCell component="th" scope="row">
+                                    {row.date}
+                                </StyledTableCell>
+                                {/*<StyledTableCell align="right" >*/}
+                                {/*    <Button sx={{*/}
+                                {/*        marginRight: '10px'*/}
+                                {/*    }} variant="contained" onClick={() => handleClickOpen(row.name)}>Add</Button>*/}
+                                {/*    <Button variant="contained" onClick={() => setProfileData(true)}>View</Button>*/}
+                                {/*</StyledTableCell>*/}
                             </StyledTableRow>
-                       
+                        ))}
+
                     </TableBody>
                 </Table>
             </TableContainer>
