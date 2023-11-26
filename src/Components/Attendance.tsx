@@ -115,9 +115,10 @@ export default function Attendance() {
                     data: []
                 })
             }
-        )
+        ).then((res: any) => {
             setInputValue("")
             getUser();
+        })
     };
 
     useEffect(() => {
@@ -143,7 +144,7 @@ export default function Attendance() {
                         onChange={(e) => setInputValue(e.target.value)} />
                 </Grid>
                 <Grid item >
-                    <Button variant="contained" onClick={handleClickOpenUser}>Add User</Button>
+                    <Button disabled={!inputValue} variant="contained" onClick={handleClickOpenUser}>Add User</Button>
                 </Grid>
             </Grid>
 
@@ -158,9 +159,9 @@ export default function Attendance() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Object.values(userList).map((row: any, index) => (
+                        {Object.values(userList).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any, index) => (
                             <StyledTableRow key={row.name} >
-                                <StyledTableCell >{index + 1}</StyledTableCell>
+                                <StyledTableCell >{(page * rowsPerPage) + index + 1}</StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
                                     {row.name}
                                 </StyledTableCell>
@@ -178,7 +179,7 @@ export default function Attendance() {
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={Object.values(userList).length}
+                count={Object.keys(userList).length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -207,6 +208,9 @@ export default function Attendance() {
                         chanting: '',
                         reading: '',
                         hearing: '',
+                        wakeUpTime: '',
+                        mangla_aarati: '',
+                        speaker: ''
                     }} onSubmit={values => {
                         setOpenBackDrop(true)
                         fetch(
@@ -221,7 +225,10 @@ export default function Attendance() {
                                     hearing: values.hearing,
                                     name: values.name,
                                     reading: values.reading,
-                                    date: values.date
+                                    date: values.date,
+                                    wakeUpTime: values.wakeUpTime,
+                                    mangla_aarati: values.mangla_aarati,
+                                    speaker: values.speaker
                                 })
                             }
                         ).then((res: any) => {
@@ -258,9 +265,12 @@ export default function Attendance() {
                                         </Select>
                                     </FormControl>
                                     <TextField id="outlined-basic1" label="Date" type='date' name='date' onChange={handleChange} value={values.date} variant="outlined" />
-                                    <TextField id="outlined-basic2" label="Chanting" name='chanting' onChange={handleChange} value={values.chanting} variant="outlined" />
+                                    <TextField id="outlined-basic5" label="wakeUpTime" type='time' name='wakeUpTime' onChange={handleChange} value={values.wakeUpTime} variant="outlined" />
+                                    <TextField id="outlined-basic2" label="Chanting" type='number' name='chanting' onChange={handleChange} value={values.chanting} variant="outlined" />
                                     <TextField id="outlined-basic3" label="Reading" name='reading' onChange={handleChange} value={values.reading} variant="outlined" />
+                                    <TextField id="outlined-basic7" label="Speaker" name='speaker' onChange={handleChange} value={values.speaker} variant="outlined" />
                                     <TextField id="outlined-basic4" label="Hearing" name='hearing' onChange={handleChange} value={values.hearing} variant="outlined" />
+                                    <TextField id="outlined-basic6" label="Mangala aarati" name='mangla_aarati' onChange={handleChange} value={values.mangla_aarati} variant="outlined" />
                                 </Box>
                                 <DialogActions>
                                     <Button onClick={handleClose}>Disagree</Button>

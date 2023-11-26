@@ -1,4 +1,15 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, styled, tableCellClasses } from '@mui/material'
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    styled,
+    tableCellClasses,
+    TablePagination
+} from '@mui/material'
 import React, {useEffect, useState} from 'react'
 import axios from "axios";
 import Button from "@mui/material/Button";
@@ -42,42 +53,73 @@ export default function Profile(props: any) {
         getUserData();
     }, []);
 
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const handleChangePage = (event: any, newPage: any) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: any) => {
+        setPage(0);
+        setRowsPerPage(parseInt(event.target.value, 10));
+    };
+
   return (
     <>
-    <TableContainer component={Paper} sx={{
-      minWidth: '200px',
+    <TableContainer component={Paper} style={{
+      minWidth: 'fitContent',
     }}>
                 <Table aria-label="customized table">
                     <TableHead>
                         <TableRow>
-                            <StyledTableCell>Sr. No</StyledTableCell>
-                            <StyledTableCell>Name</StyledTableCell>
-                            <StyledTableCell align="right">Start Date</StyledTableCell>
+                            <StyledTableCell >Date</StyledTableCell>
+                            <StyledTableCell>Wake Up</StyledTableCell>
+                            <StyledTableCell>Chanting</StyledTableCell>
+                            <StyledTableCell>Mangala aarati</StyledTableCell>
+                            <StyledTableCell>Reading</StyledTableCell>
+                            <StyledTableCell>Hearing</StyledTableCell>
+                            <StyledTableCell>Speaker</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
 
-                        {userList.map((row: any, index) => (
+                        {userList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any, index) => (
                             <StyledTableRow key={index} >
-                                <StyledTableCell >{index + 1}</StyledTableCell>
+                                <StyledTableCell >{row.date}</StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
-                                    {row.name}
+                                    {row.wakeUpTime}
                                 </StyledTableCell>
                                 <StyledTableCell component="th" scope="row">
-                                    {row.date}
+                                    {row.chanting}
                                 </StyledTableCell>
-                                {/*<StyledTableCell align="right" >*/}
-                                {/*    <Button sx={{*/}
-                                {/*        marginRight: '10px'*/}
-                                {/*    }} variant="contained" onClick={() => handleClickOpen(row.name)}>Add</Button>*/}
-                                {/*    <Button variant="contained" onClick={() => setProfileData(true)}>View</Button>*/}
-                                {/*</StyledTableCell>*/}
+                                <StyledTableCell component="th" scope="row">
+                                    {row.mangla_aarati}
+                                </StyledTableCell>
+                                <StyledTableCell component="th" scope="row">
+                                    {row.reading}
+                                </StyledTableCell>
+                                <StyledTableCell component="th" scope="row">
+                                    {row.hearing}
+                                </StyledTableCell>
+                                <StyledTableCell component="th" scope="row">
+                                    {row.speaker}
+                                </StyledTableCell>
                             </StyledTableRow>
                         ))}
 
                     </TableBody>
                 </Table>
             </TableContainer>
+
+        <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={Object.keys(userList).length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+        />
     </>
   )
 }
