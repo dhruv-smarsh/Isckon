@@ -165,7 +165,10 @@ export default function Attendance() {
                                 <StyledTableCell component="th" scope="row">
                                     {row.name}
                                 </StyledTableCell>
-                                <StyledTableCell align="right" >
+                                <StyledTableCell align="center" style={{
+                                    display: 'flex',
+                                    justifyContent: 'spaceEvenly'
+                                }}>
                                     <Button sx={{
                                         marginRight: '10px'
                                     }} variant="contained" onClick={() => handleClickOpen(row.name)}>Add</Button>
